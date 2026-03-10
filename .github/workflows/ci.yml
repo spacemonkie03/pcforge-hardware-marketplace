@@ -1,0 +1,95 @@
+name: CI/CD
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: pc_user
+          POSTGRES_PASSWORD: pc_pass
+          POSTGRES_DB: pc_hardware
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd="pg_isready -U pc_user -d pc_hardware"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=5
+      redis:
+        image: redis:7-alpine
+        ports:
+          - 6379:6379
+      elasticsearch:
+        image: docker.elastic.co/elasticsearch/elasticsearch:8.13.0
+        env:
+          discovery.type: single-node
+        ports:
+          - 9200:9200
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Use Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install backend deps
+        working-directory: ./backend
+        run: npm ci
+
+      - name: Install frontend deps
+        working-directory: ./frontend
+        run: npm ci
+
+      - name: Lint backend
+        working-directory: ./backend
+        run: npm run lint -- --max-warnings=0
+
+      - name: Lint frontend
+        working-directory: ./frontend
+        run: npm run lint -- --max-warnings=0
+
+      - name: Test backend
+        working-directory: ./backend
+        env:
+          DB_HOST: localhost
+          DB_PORT: 5432
+          DB_USER: pc_user
+          DB_PASS: pc_pass
+          DB_NAME: pc_hardware
+          REDIS_HOST: localhost
+          REDIS_PORT: 6379
+          ES_NODE: http://localhost:9200
+        run: npm test
+
+      - name: Test frontend
+        working-directory: ./frontend
+        run: npm test
+
+      - name: Build backend
+        working-directory: ./backend
+        run: npm run build
+
+      - name: Build frontend
+        working-directory: ./frontend
+        run: npm run build
+
+      - name: Build Docker images
+        run: |
+          docker build -t pc-hardware-backend ./backend
+          docker build -t pc-hardware-frontend ./frontend
+
+      - name: Deploy
+        if: github.ref == 'refs/heads/main'
+        run: echo "Deploy step - integrate with your platform (e.g., Kubernetes, ECS, etc.)."
+
