@@ -45,6 +45,9 @@ jobs:
         with:
           node-version: '20'
 
+      - name: Install root deps
+        run: npm ci
+
       - name: Install backend deps
         working-directory: ./backend
         run: npm ci
