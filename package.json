@@ -1,0 +1,26 @@
+{
+  "name": "pc-hardware-marketplace",
+  "version": "1.0.0",
+  "description": "A comprehensive e-commerce platform for buying and selling PC hardware components, featuring an intelligent PC builder with compatibility checks, live price tracking, and advanced search capabilities.",
+  "main": ".eslintrc.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/spacemonkie03/pcforge-hardware-marketplace.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/spacemonkie03/pcforge-hardware-marketplace/issues"
+  },
+  "homepage": "https://github.com/spacemonkie03/pcforge-hardware-marketplace#readme",
+  "devDependencies": {
+    "@typescript-eslint/eslint-plugin": "^8.57.0",
+    "@typescript-eslint/parser": "^8.57.0",
+    "eslint": "8.57.1"
+  }
+}
