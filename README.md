@@ -9,6 +9,7 @@ A comprehensive e-commerce platform for buying and selling PC hardware component
 - **Database**: PostgreSQL
 - **Cache**: Redis
 - **Search**: Elasticsearch
+- **Search**: Elasticsearch
 - **Infrastructure**: Docker, Docker Compose, Nginx
 
 ## Features
