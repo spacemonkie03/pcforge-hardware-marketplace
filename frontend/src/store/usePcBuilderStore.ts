@@ -5,8 +5,11 @@ export interface SelectedParts {
   motherboardId?: string;
   gpuId?: string;
   ramId?: string;
+  storageId?: string;
   psuId?: string;
   caseId?: string;
+  coolerId?: string;
+  fanId?: string;
 }
 
 interface PcBuilderState {

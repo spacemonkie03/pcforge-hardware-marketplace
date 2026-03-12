@@ -22,23 +22,47 @@ export default function HomePage() {
   return (
     <Layout>
       <div className="mb-6">
-        <h1 className="text-2xl font-semibold mb-1">
-          Build your dream <span className="text-neonBlue">PC</span>
+        <h1 className="text-3xl font-bold mb-2">
+          Build your dream <span className="text-blue-400">PC</span>
         </h1>
-        <p className="text-sm text-gray-400">
+        <p className="text-gray-400">
           Curated components with smart compatibility checks and live price tracking.
         </p>
       </div>
-      <ProductFilters onChange={setFilters} />
-      {isLoading && <p className="text-sm text-gray-400">Loading products...</p>}
-      {!isLoading && data && (
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-          {data.map((p) => (
-            <ProductCard key={p.id} product={p} />
-          ))}
-        </div>
-      )}
-      <CompareTable products={compareProducts} />
+
+      <div className="flex gap-6">
+        {/* Sidebar Filters */}
+        <aside className="w-full md:w-64 flex-shrink-0">
+          <div className="sticky top-24">
+            <ProductFilters onChange={setFilters} />
+          </div>
+        </aside>
+
+        {/* Main Content */}
+        <main className="flex-1 min-w-0">
+          {isLoading && (
+            <div className="flex items-center justify-center py-12">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-400"></div>
+              <span className="ml-3 text-gray-400">Loading products...</span>
+            </div>
+          )}
+
+          {!isLoading && data && (
+            <>
+              <div className="mb-4 text-sm text-gray-400">
+                {data.length} products found
+              </div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                {data.map((p) => (
+                  <ProductCard key={p.id} product={p} />
+                ))}
+              </div>
+            </>
+          )}
+
+          <CompareTable products={compareProducts} />
+        </main>
+      </div>
     </Layout>
   );
 }

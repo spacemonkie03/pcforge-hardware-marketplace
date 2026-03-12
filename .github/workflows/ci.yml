@@ -1,15 +1,30 @@
-name: CI/CD
+name: CI
 
 on:
   push:
-    branches: [main]
   pull_request:
-    branches: [main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  NODE_VERSION: "20"
+  CI: "true"
+  NEXT_TELEMETRY_DISABLED: "1"
 
 jobs:
-  build-and-test:
+  backend:
+    name: Backend CI
     runs-on: ubuntu-latest
-
+    timeout-minutes: 20
+    defaults:
+      run:
+        shell: bash
+        working-directory: backend
     services:
       postgres:
         image: postgres:16-alpine
@@ -20,78 +35,129 @@ jobs:
         ports:
           - 5432:5432
         options: >-
-          --health-cmd="pg_isready -U pc_user -d pc_hardware"
-          --health-interval=10s
-          --health-timeout=5s
-          --health-retries=5
+          --health-cmd "pg_isready -U pc_user -d pc_hardware"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
       redis:
         image: redis:7-alpine
         ports:
           - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
       elasticsearch:
         image: docker.elastic.co/elasticsearch/elasticsearch:8.13.0
         env:
           discovery.type: single-node
+          xpack.security.enabled: "false"
+          ES_JAVA_OPTS: -Xms512m -Xmx512m
         ports:
           - 9200:9200
-
+        options: >-
+          --health-cmd "curl -fsS http://localhost:9200/_cluster/health || exit 1"
+          --health-interval 20s
+          --health-timeout 10s
+          --health-retries 10
+    env:
+      DB_HOST: localhost
+      DB_PORT: 5432
+      DB_USER: pc_user
+      DB_PASS: pc_pass
+      DB_NAME: pc_hardware
+      REDIS_HOST: localhost
+      REDIS_PORT: 6379
+      ES_NODE: http://localhost:9200
+      ES_INDEX: products
+      JWT_SECRET: ci-jwt-secret
     steps:
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
+      - name: Checkout repository
+        uses: actions/checkout@v4
 
-      - name: Use Node.js
+      - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+          cache-dependency-path: backend/package-lock.json
 
-      - name: Install backend deps
-        working-directory: ./backend
+      - name: Install dependencies
         run: npm ci
 
-      - name: Install frontend deps
-        working-directory: ./frontend
+      - name: Lint
+        run: npm run lint -- --max-warnings=0
+
+      - name: Type check
+        run: npx tsc --noEmit -p tsconfig.json
+
+      - name: Run tests
+        run: npm test -- --runInBand --passWithNoTests
+
+      - name: Build
+        run: npm run build
+
+  frontend:
+    name: Frontend CI
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    defaults:
+      run:
+        shell: bash
+        working-directory: frontend
+    env:
+      NEXT_PUBLIC_API_URL: /api
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Install dependencies
         run: npm ci
 
-      - name: Lint backend
-        working-directory: ./backend
+      - name: Lint
         run: npm run lint -- --max-warnings=0
 
-      - name: Lint frontend
-        working-directory: ./frontend
-        run: npm run lint -- --max-warnings=0
+      - name: Type check
+        run: npx tsc --noEmit
 
-      - name: Test backend
-        working-directory: ./backend
-        env:
-          DB_HOST: localhost
-          DB_PORT: 5432
-          DB_USER: pc_user
-          DB_PASS: pc_pass
-          DB_NAME: pc_hardware
-          REDIS_HOST: localhost
-          REDIS_PORT: 6379
-          ES_NODE: http://localhost:9200
-        run: npm test
+      - name: Run tests
+        run: npm test -- --runInBand --passWithNoTests
 
-      - name: Test frontend
-        working-directory: ./frontend
-        run: npm test
-
-      - name: Build backend
-        working-directory: ./backend
+      - name: Build
         run: npm run build
 
-      - name: Build frontend
-        working-directory: ./frontend
-        run: npm run build
+  docker:
+    name: Docker Validation
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    defaults:
+      run:
+        shell: bash
+    env:
+      DOCKER_BUILDKIT: "1"
+      COMPOSE_DOCKER_CLI_BUILD: "1"
+      BUILDKIT_PROGRESS: plain
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
 
-      - name: Build Docker images
-        run: |
-          docker build -t pc-hardware-backend ./backend
-          docker build -t pc-hardware-frontend ./frontend
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
 
-      - name: Deploy
-        if: github.ref == 'refs/heads/main'
-        run: echo "Deploy step - integrate with your platform (e.g., Kubernetes, ECS, etc.)."
+      - name: Validate Compose configuration
+        run: docker compose config -q
+
+      - name: Pull base service images
+        run: docker compose pull postgres redis elasticsearch
+
+      - name: Build application images
+        run: docker compose build --pull backend frontend nginx
 
