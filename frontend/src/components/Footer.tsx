@@ -1,3 +1,4 @@
+import Link from 'next/link';
 import React from 'react';
 
 export const Footer: React.FC = () => {
@@ -23,7 +24,7 @@ export const Footer: React.FC = () => {
           <div>
             <h4 className="font-medium mb-2">Tools</h4>
             <ul className="space-y-1 text-gray-400">
-              <li><a href="/pc-builder" className="hover:text-neonBlue transition-colors">PC Builder</a></li>
+              <li><Link href="/pc-builder" className="hover:text-neonBlue transition-colors">PC Builder</Link></li>
               <li><a href="#" className="hover:text-neonBlue transition-colors">Compatibility Check</a></li>
               <li><a href="#" className="hover:text-neonBlue transition-colors">Price Tracker</a></li>
             </ul>

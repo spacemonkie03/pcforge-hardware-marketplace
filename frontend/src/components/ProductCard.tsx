@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import { Product } from '../features/products';
 import { useCompareStore } from '../store/useCompareStore';
-import { usePcBuilderStore } from '../store/usePcBuilderStore';
+import { SelectedParts, usePcBuilderStore } from '../store/usePcBuilderStore';
 import clsx from 'clsx';
 
 interface Props {
@@ -14,7 +14,7 @@ export const ProductCard: React.FC<Props> = ({ product }) => {
 
   const handleAddToBuild = () => {
     // Map category to store key
-    const categoryMap: Record<string, string> = {
+    const categoryMap: Record<string, keyof SelectedParts> = {
       CPU: 'cpuId',
       MOTHERBOARD: 'motherboardId',
       GPU: 'gpuId',
