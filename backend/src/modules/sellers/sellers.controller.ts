@@ -39,10 +39,17 @@ export class SellersController {
   }
 
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(UserRole.SELLER)
+  @Roles(UserRole.SELLER, UserRole.ADMIN)
+  @Get('me/analytics')
+  async myAnalytics(@Request() req: any) {
+    return this.sellersService.analyticsForCurrentUser(req.user.id);
+  }
+
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.SELLER, UserRole.ADMIN)
   @Get(':id/analytics')
-  async analytics(@Param('id') id: string) {
-    return this.sellersService.analyticsForSeller(id);
+  async analytics(@Param('id') id: string, @Request() req: any) {
+    return this.sellersService.analyticsForSeller(id, req.user.id, req.user.role);
   }
 }
 

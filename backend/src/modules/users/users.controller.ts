@@ -4,6 +4,9 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { AuthService } from '../auth/auth.service';
 import { LoginDto } from './dto/login.dto';
 import { JwtAuthGuard } from '../auth/jwt.guard';
+import { Roles } from '../../common/decorators/roles.decorator';
+import { UserRole } from '../../common/enums/role.enum';
+import { RolesGuard } from '../../common/guards/roles.guard';
 
 @Controller('users')
 export class UsersController {
@@ -28,6 +31,13 @@ export class UsersController {
   @Get('me')
   async me(@Request() req: any) {
     return this.usersService.findById(req.user.id);
+  }
+
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.ADMIN)
+  @Get('admin/stats')
+  async adminStats() {
+    return this.usersService.getAdminStats();
   }
 }
 

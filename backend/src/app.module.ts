@@ -11,6 +11,12 @@ import { PcBuilderModule } from './modules/pc-builder/pc-builder.module';
 import { SearchModule } from './modules/search/search.module';
 import { OrdersModule } from './modules/orders/orders.module';
 import { AuthModule } from './modules/auth/auth.module';
+import { GpusModule } from './gpus/gpus.module';
+import { ListingsModule } from './listings/listings.module';
+import { AddressesModule } from './modules/addresses/addresses.module';
+import { PaymentMethodsModule } from './modules/payment-methods/payment-methods.module';
+import { CartModule } from './modules/cart/cart.module';
+import { ImageStorageModule } from './modules/image-storage/image-storage.module';
 
 @Module({
   imports: [
@@ -30,7 +36,13 @@ import { AuthModule } from './modules/auth/auth.module';
     ReviewsModule,
     PcBuilderModule,
     SearchModule,
-    OrdersModule
+    AddressesModule,
+    PaymentMethodsModule,
+    CartModule,
+    ImageStorageModule,
+    OrdersModule,
+    GpusModule,
+    ListingsModule
   ]
 })
 export class AppModule {}

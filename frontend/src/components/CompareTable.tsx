@@ -1,5 +1,6 @@
 import React from 'react';
 import { Product } from '../features/products';
+import { formatINR } from '../utils/currency';
 
 interface Props {
   products: Product[];
@@ -9,36 +10,36 @@ export const CompareTable: React.FC<Props> = ({ products }) => {
   if (!products.length) return null;
 
   return (
-    <div className="glass-panel p-4 mt-6 overflow-x-auto">
-      <h3 className="text-sm font-semibold mb-3">Comparison</h3>
+    <div className="overflow-x-auto">
+      <h3 className="mb-3 text-sm font-semibold text-white">Comparison</h3>
       <table className="min-w-full text-xs">
         <thead>
-          <tr>
-            <th className="text-left text-gray-400">Spec</th>
+          <tr className="border-b border-white/10 text-left text-[var(--pf-text-secondary)]">
+            <th className="py-2 pr-4">Spec</th>
             {products.map((p) => (
-              <th key={p.id} className="text-left">
+              <th key={p.id} className="py-2 pr-4 text-left">
                 {p.name}
               </th>
             ))}
           </tr>
         </thead>
         <tbody>
-          <tr>
-            <td className="text-gray-400">Brand</td>
+          <tr className="border-b border-white/5">
+            <td className="py-2 pr-4 text-[var(--pf-text-secondary)]">Brand</td>
             {products.map((p) => (
-              <td key={p.id}>{p.brand}</td>
+              <td key={p.id} className="py-2 pr-4 text-white">{p.brand}</td>
+            ))}
+          </tr>
+          <tr className="border-b border-white/5">
+            <td className="py-2 pr-4 text-[var(--pf-text-secondary)]">Price</td>
+            {products.map((p) => (
+              <td key={p.id} className="py-2 pr-4 text-white">{formatINR(p.price)}</td>
             ))}
           </tr>
           <tr>
-            <td className="text-gray-400">Price</td>
+            <td className="py-2 pr-4 text-[var(--pf-text-secondary)]">Rating</td>
             {products.map((p) => (
-              <td key={p.id}>${Number(p.price).toFixed(2)}</td>
-            ))}
-          </tr>
-          <tr>
-            <td className="text-gray-400">Rating</td>
-            {products.map((p) => (
-              <td key={p.id}>
+              <td key={p.id} className="py-2 pr-4 text-white">
                 {p.rating.toFixed(1)} ({p.ratingCount})
               </td>
             ))}

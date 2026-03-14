@@ -12,7 +12,9 @@ concurrency:
   cancel-in-progress: true
 
 env:
-  NODE_VERSION: "20"
+  # Run project commands on a current Node release so CI does not rely on the
+  # deprecated Node 20 toolchain or older action runtimes.
+  NODE_VERSION: "24"
   CI: "true"
   NEXT_TELEMETRY_DISABLED: "1"
 
@@ -74,10 +76,13 @@ jobs:
       JWT_SECRET: ci-jwt-secret
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        # checkout v6 runs on the Node 24 action runtime.
+        uses: actions/checkout@v6
 
       - name: Set up Node.js
-        uses: actions/setup-node@v4
+        # setup-node v6 also runs on the Node 24 action runtime while pinning
+        # the Node version used by npm, lint, test, and build commands.
+        uses: actions/setup-node@v6
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: npm
@@ -110,10 +115,13 @@ jobs:
       NEXT_PUBLIC_API_URL: /api
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        # checkout v6 runs on the Node 24 action runtime.
+        uses: actions/checkout@v6
 
       - name: Set up Node.js
-        uses: actions/setup-node@v4
+        # setup-node v6 also runs on the Node 24 action runtime while pinning
+        # the Node version used by npm, lint, test, and build commands.
+        uses: actions/setup-node@v6
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: npm
@@ -147,7 +155,8 @@ jobs:
       BUILDKIT_PROGRESS: plain
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        # checkout v6 runs on the Node 24 action runtime.
+        uses: actions/checkout@v6
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3

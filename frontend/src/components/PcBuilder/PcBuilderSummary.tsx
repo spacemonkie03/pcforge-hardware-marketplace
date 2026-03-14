@@ -1,6 +1,9 @@
 import React from 'react';
 import { SelectedParts } from '../../store/usePcBuilderStore';
 import { Product } from '../../features/products';
+import { getFallbackImageForProductCategory } from '../../utils/imageAssets';
+import { formatINR } from '../../utils/currency';
+import { Card } from '../ui/Card';
 
 interface Props {
   selection: SelectedParts;
@@ -23,31 +26,41 @@ export const PcBuilderSummary: React.FC<Props> = ({
   const total = picked.reduce((sum, p) => sum + Number(p.price), 0);
 
   return (
-    <div className="bg-gray-800/50 backdrop-blur-sm border border-white/10 rounded-lg p-6 sticky top-6">
-      <h3 className="text-lg font-semibold mb-4 text-white">Build Summary</h3>
+    <Card className="sticky top-24 p-6">
+      <p className="pf-eyebrow">Build Summary</p>
+      <h3 className="mt-2 text-xl font-semibold text-white">Current selection</h3>
 
       {picked.length > 0 ? (
-        <div className="space-y-3 mb-4">
+        <div className="mb-4 space-y-3">
           {picked.map((p) => (
-            <div key={p.id} className="flex justify-between items-center py-2 border-b border-white/5">
-              <div className="flex-1 min-w-0">
-                <p className="text-sm font-medium text-white truncate">{p.name}</p>
-                <p className="text-xs text-gray-400">{p.category}</p>
+            <div key={p.id} className="flex items-center justify-between gap-3 border-b border-[var(--pf-border)] py-3">
+              <div className="flex min-w-0 flex-1 items-center gap-3">
+                <div className="h-12 w-12 shrink-0 overflow-hidden rounded-lg border border-[var(--pf-border)] bg-white/[0.03]">
+                  <img
+                    src={p.images?.[0] || getFallbackImageForProductCategory(p.category)}
+                    alt={p.name}
+                    className="h-full w-full object-cover"
+                  />
+                </div>
+                <div className="min-w-0 flex-1">
+                  <p className="truncate text-sm font-medium text-white">{p.name}</p>
+                  <p className="text-xs text-[var(--pf-text-secondary)]">{p.category}</p>
+                </div>
               </div>
-              <p className="text-sm font-semibold text-blue-400 ml-2">
-                ${Number(p.price).toFixed(2)}
+              <p className="ml-2 text-sm font-semibold text-[var(--pf-accent-primary)]">
+                {formatINR(p.price)}
               </p>
             </div>
           ))}
         </div>
       ) : (
-        <p className="text-gray-400 text-sm mb-4">No components selected yet.</p>
+        <p className="mb-4 text-sm text-[var(--pf-text-secondary)]">No components selected yet.</p>
       )}
 
-      <div className="border-t border-white/10 pt-4">
-        <div className="flex justify-between items-center mb-4">
+      <div className="border-t border-[var(--pf-border)] pt-4">
+        <div className="mb-4 flex items-center justify-between">
           <span className="text-lg font-bold text-white">Total</span>
-          <span className="text-xl font-bold text-blue-400">${total.toFixed(2)}</span>
+          <span className="text-xl font-bold text-[var(--pf-accent-primary)]">{formatINR(total)}</span>
         </div>
 
         {valid !== undefined && (
@@ -77,7 +90,7 @@ export const PcBuilderSummary: React.FC<Props> = ({
           </div>
         )}
       </div>
-    </div>
+    </Card>
   );
 };
 

@@ -1,15 +1,14 @@
-import { useQuery } from "@tanstack/react-query";
-import { fetchProducts, searchProducts } from "../features/products";
-import { Product } from "../features/products";
+import { useQuery } from '@tanstack/react-query';
+import { fetchProducts, Product, searchProducts } from '../features/products';
 
 export const useProducts = (searchParams?: any) => {
-  const queryKey = ["products", searchParams];
-
-  const queryFn = () =>
-    searchParams ? searchProducts(searchParams) : fetchProducts();
+  const hasSearchParams = Boolean(
+    searchParams &&
+      Object.values(searchParams).some((value) => value !== undefined && value !== '')
+  );
 
   return useQuery<Product[]>({
-    queryKey,
-    queryFn,
+    queryKey: ['products', searchParams],
+    queryFn: () => (hasSearchParams ? searchProducts(searchParams) : fetchProducts()),
   });
 };

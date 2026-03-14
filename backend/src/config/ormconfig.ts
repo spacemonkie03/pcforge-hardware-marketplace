@@ -1,5 +1,6 @@
 import { ConfigService } from '@nestjs/config';
 import { TypeOrmModuleOptions } from '@nestjs/typeorm';
+import { join } from 'path';
 
 export const ormConfig = (configService: ConfigService): TypeOrmModuleOptions => {
   const db = configService.get('database');
@@ -11,7 +12,9 @@ export const ormConfig = (configService: ConfigService): TypeOrmModuleOptions =>
     password: db.pass,
     database: db.name,
     autoLoadEntities: true,
-    synchronize: true,
+    synchronize: false,
+    migrationsRun: true,
+    migrations: [join(__dirname, '..', 'database', 'migrations', '*{.js,.ts}')],
     logging: false
   };
 };

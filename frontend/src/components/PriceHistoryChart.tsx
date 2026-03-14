@@ -1,4 +1,6 @@
 import React from 'react';
+import { formatINR } from '../utils/currency';
+import { Card } from './ui/Card';
 
 interface PricePoint {
   recordedAt: string;
@@ -22,13 +24,13 @@ export const PriceHistoryChart: React.FC<Props> = ({ history }) => {
     ((price - min) / (max - min || 1)) * 80 + 10;
 
   return (
-    <div className="glass-panel p-4 mt-4">
-      <h4 className="text-xs text-gray-300 mb-2">Price history</h4>
+    <Card className="mt-4 p-4">
+      <h4 className="mb-2 text-xs uppercase tracking-[0.14em] text-[var(--pf-text-secondary)]">Price history</h4>
       <svg viewBox="0 0 100 100" className="w-full h-32">
         <defs>
           <linearGradient id="line" x1="0" x2="1" y1="0" y2="0">
-            <stop offset="0%" stopColor="#32e5ff" />
-            <stop offset="100%" stopColor="#ff00ff" />
+            <stop offset="0%" stopColor="#6366F1" />
+            <stop offset="100%" stopColor="#8B5CF6" />
           </linearGradient>
         </defs>
         {sorted.map((p, i) => {
@@ -51,10 +53,10 @@ export const PriceHistoryChart: React.FC<Props> = ({ history }) => {
           );
         })}
       </svg>
-      <p className="text-xs text-gray-400 mt-1">
-        Lowest: <span className="text-neonBlue">${min.toFixed(2)}</span>
+      <p className="mt-1 text-xs text-[var(--pf-text-secondary)]">
+        Lowest: <span className="font-semibold text-[var(--pf-accent-primary)]">{formatINR(min)}</span>
       </p>
-    </div>
+    </Card>
   );
 };
 

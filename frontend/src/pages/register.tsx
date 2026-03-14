@@ -2,6 +2,9 @@ import { Layout } from '../components/Layout';
 import { useRegister } from '../hooks/useAuth';
 import { useState } from 'react';
 import { useRouter } from 'next/router';
+import { ButtonPrimary } from '../components/ui/ButtonPrimary';
+import { Card } from '../components/ui/Card';
+import { SectionContainer } from '../components/ui/SectionContainer';
 
 export default function RegisterPage() {
   const [name, setName] = useState('');
@@ -13,48 +16,48 @@ export default function RegisterPage() {
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
     await mutateAsync({ name, email, password });
-    router.push('/');
+    router.replace('/');
   };
 
   return (
     <Layout>
-      <div className="max-w-sm mx-auto glass-panel p-6 mt-10">
-        <h1 className="text-lg font-semibold mb-4">Create account</h1>
-        <form onSubmit={submit} className="space-y-3 text-sm">
-          <input
-            className="w-full bg-black/40 border border-white/10 rounded px-3 py-2"
-            placeholder="Name"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-          />
-          <input
-            className="w-full bg-black/40 border border-white/10 rounded px-3 py-2"
-            placeholder="Email"
-            type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-          />
-          <input
-            className="w-full bg-black/40 border border-white/10 rounded px-3 py-2"
-            placeholder="Password"
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-          />
-          {error && (
-            <p className="text-xs text-red-400">
-              {(error as any)?.response?.data?.error?.message || 'Registration failed'}
-            </p>
-          )}
-          <button
-            type="submit"
-            disabled={isPending}
-            className="w-full bg-neonBlue/30 border border-neonBlue rounded py-2 text-sm hover:bg-neonBlue/40"
-          >
-            {isPending ? 'Creating...' : 'Sign up'}
-          </button>
-        </form>
-      </div>
+      <SectionContainer
+        title="Create Account"
+        description="Set up a buyer account inside the same interface used everywhere else in PCForge."
+      >
+        <Card className="mx-auto max-w-md p-6">
+          <form onSubmit={submit} className="space-y-4 text-sm">
+            <input
+              className="pf-input"
+              placeholder="Name"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+            />
+            <input
+              className="pf-input"
+              placeholder="Email"
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+            />
+            <input
+              className="pf-input"
+              placeholder="Password"
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+            />
+            {error && (
+              <p className="text-xs text-red-400">
+                {(error as any)?.response?.data?.error?.message || 'Registration failed'}
+              </p>
+            )}
+            <ButtonPrimary type="submit" disabled={isPending} className="w-full">
+              {isPending ? 'Creating...' : 'Sign up'}
+            </ButtonPrimary>
+          </form>
+        </Card>
+      </SectionContainer>
     </Layout>
   );
 }

@@ -42,15 +42,21 @@ export class ProductsController {
   @Roles(UserRole.SELLER, UserRole.ADMIN)
   @Post()
   async create(@Body() dto: CreateProductDto, @Request() req: any) {
-    const sellerId = req.user.id;
-    return this.productsService.create(dto, sellerId);
+    return this.productsService.create(dto, req.user.id);
+  }
+
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.ADMIN)
+  @Post('admin/demo-catalog')
+  async seedDemoCatalog(@Request() req: any) {
+    return this.productsService.seedDemoCatalogForUser(req.user.id);
   }
 
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(UserRole.SELLER, UserRole.ADMIN)
   @Put(':id')
-  async update(@Param('id') id: string, @Body() dto: UpdateProductDto) {
-    return this.productsService.update(id, dto);
+  async update(@Param('id') id: string, @Body() dto: UpdateProductDto, @Request() req: any) {
+    return this.productsService.update(id, dto, req.user.id, req.user.role);
   }
 
   @UseGuards(JwtAuthGuard, RolesGuard)

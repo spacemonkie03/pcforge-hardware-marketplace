@@ -35,5 +35,11 @@ export class UsersService {
     if (!user) throw new NotFoundException('User not found');
     return user;
   }
+
+  async getAdminStats() {
+    return {
+      totalUsers: await this.userRepo.count(),
+    };
+  }
 }
 

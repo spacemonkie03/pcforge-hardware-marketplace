@@ -1,5 +1,7 @@
 import React from 'react';
 import { Product } from '../../features/products';
+import { getFallbackImageForProductCategory } from '../../utils/imageAssets';
+import { formatINR } from '../../utils/currency';
 
 interface Props {
   label: string;
@@ -9,26 +11,38 @@ interface Props {
 }
 
 export const PartSelector: React.FC<Props> = ({ label, options, value, onChange }) => {
-  const selectedProduct = options.find(p => p.id === value);
+  const selectedProduct = options.find((p) => p.id === value);
 
   return (
-    <div className="space-y-2">
-      <label className="block text-sm font-medium text-gray-300">{label}</label>
+    <div className="space-y-3">
+      <label className="pf-label">{label}</label>
       <select
         value={value || ''}
         onChange={(e) => onChange(e.target.value || undefined)}
-        className="w-full bg-gray-700/50 border border-white/10 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-blue-400 focus:ring-1 focus:ring-blue-400/25 transition-all"
+        className="pf-input"
       >
         <option value="">Select {label.toLowerCase()}</option>
         {options.map((p) => (
           <option key={p.id} value={p.id}>
-            {p.name} - ${Number(p.price).toFixed(2)}
+            {p.name} - {formatINR(p.price)}
           </option>
         ))}
       </select>
       {selectedProduct && (
-        <div className="text-xs text-gray-400 bg-gray-800/30 rounded px-2 py-1">
-          Selected: {selectedProduct.name} (${Number(selectedProduct.price).toFixed(2)})
+        <div className="flex items-center gap-3 rounded-xl border border-white/5 bg-white/5 px-3 py-3 text-xs text-[var(--pf-text-secondary)]">
+          <div className="h-12 w-12 overflow-hidden rounded-lg border border-white/10 bg-black/20">
+            <img
+              src={selectedProduct.images?.[0] || getFallbackImageForProductCategory(selectedProduct.category)}
+              alt={selectedProduct.name}
+              className="h-full w-full object-cover"
+            />
+          </div>
+          <div className="min-w-0">
+            <p className="truncate text-sm font-medium text-white">{selectedProduct.name}</p>
+            <p className="mt-1 text-xs text-[var(--pf-text-secondary)]">
+              {formatINR(selectedProduct.price)}
+            </p>
+          </div>
         </div>
       )}
     </div>

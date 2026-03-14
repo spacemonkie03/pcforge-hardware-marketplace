@@ -14,3 +14,8 @@ export const login = async (payload: { email: string; password: string }) => {
   return res.data.data;
 };
 
+export const fetchCurrentUser = async () => {
+  const res = await apiClient.get('/users/me');
+  return res.data.data;
+};
+

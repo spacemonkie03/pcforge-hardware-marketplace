@@ -34,7 +34,8 @@ jobs:
         shell: bash
     steps:
       - name: Checkout deployment source
-        uses: actions/checkout@v4
+        # checkout v6 runs on the Node 24 action runtime.
+        uses: actions/checkout@v6
         with:
           ref: ${{ github.event_name == 'workflow_run' && github.event.workflow_run.head_sha || github.sha }}
 

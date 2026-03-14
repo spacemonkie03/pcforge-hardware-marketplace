@@ -2,9 +2,13 @@ import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { SearchService } from './search.service';
 import { createElasticClient } from '../../config/elastic.config';
+import { SearchController } from './search.controller';
+import { ProductsModule } from '../products/products.module';
+import { ListingsModule } from '../../listings/listings.module';
+import { GpusModule } from '../../gpus/gpus.module';
 
 @Module({
-  imports: [ConfigModule],
+  imports: [ConfigModule, ProductsModule, ListingsModule, GpusModule],
   providers: [
     SearchService,
     {
@@ -13,6 +17,7 @@ import { createElasticClient } from '../../config/elastic.config';
       useFactory: createElasticClient
     }
   ],
+  controllers: [SearchController],
   exports: [SearchService, 'ELASTIC_CLIENT']
 })
 export class SearchModule {}
